@@ -12,12 +12,29 @@ return {
   lazy = false,
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '<leader>fb', ':Neotree buffers reveal<CR>', desc = 'NeoTree [F]ile [B]uffers', silent = true },
   },
   opts = {
+    sources = { 'filesystem', 'buffers' },
     filesystem = {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          [']'] = 'next_source',
+          ['['] = 'prev_source',
+        },
+      },
+    },
+    buffers = {
+      follow_current_file = {
+        enabled = true,
+      },
+      window = {
+        mappings = {
+          ['\\'] = 'close_window',
+          [']'] = 'next_source',
+          ['['] = 'prev_source',
+          ['d'] = 'buffer_delete',
         },
       },
     },
