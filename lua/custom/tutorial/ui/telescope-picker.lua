@@ -19,8 +19,8 @@ function M.open(opts)
   local action_state = require('telescope.actions.state')
   local previewers = require('telescope.previewers')
 
-  local tutorial_module = require('custom.plugins.tutorial')
-  local progress_module = require('custom.plugins.tutorial.progress')
+  local tutorial_module = require('custom.tutorial')
+  local progress_module = require('custom.tutorial.progress')
   local tutorials = tutorial_module.get_all_tutorials()
 
   -- Filter tutorials based on options
@@ -118,7 +118,7 @@ function M.open(opts)
           actions.close(prompt_bufnr)
 
           -- Open the selected tutorial
-          local ui_float = require('custom.plugins.tutorial.ui.floating-window')
+          local ui_float = require('custom.tutorial.ui.floating-window')
           ui_float.open(selection.value)
         end)
 

@@ -21,7 +21,7 @@ function M.get_all_tutorials()
   }
 
   for _, file in ipairs(vim_motion_files) do
-    local ok, tutorial = pcall(require, 'custom.plugins.tutorial.content.vim-motions.' .. file)
+    local ok, tutorial = pcall(require, 'custom.tutorial.content.vim-motions.' .. file)
     if ok then
       table.insert(tutorials, tutorial)
     end
@@ -39,7 +39,7 @@ function M.get_all_tutorials()
   }
 
   for _, file in ipairs(keybinding_files) do
-    local ok, tutorial = pcall(require, 'custom.plugins.tutorial.content.keybindings.' .. file)
+    local ok, tutorial = pcall(require, 'custom.tutorial.content.keybindings.' .. file)
     if ok then
       table.insert(tutorials, tutorial)
     end
@@ -76,7 +76,7 @@ end
 -- Open tutorial browser (Telescope picker)
 function M.open_browser(opts)
   if not ui_telescope then
-    ui_telescope = require('custom.plugins.tutorial.ui.telescope-picker')
+    ui_telescope = require('custom.tutorial.ui.telescope-picker')
   end
 
   ui_telescope.open(opts or {})
@@ -92,7 +92,7 @@ function M.open_tutorial(id)
   end
 
   if not ui_float then
-    ui_float = require('custom.plugins.tutorial.ui.floating-window')
+    ui_float = require('custom.tutorial.ui.floating-window')
   end
 
   ui_float.open(tutorial)
@@ -101,7 +101,7 @@ end
 -- Show progress dashboard
 function M.show_progress()
   if not progress then
-    progress = require('custom.plugins.tutorial.progress')
+    progress = require('custom.tutorial.progress')
   end
 
   local dashboard = progress.get_dashboard()
@@ -165,7 +165,7 @@ end
 -- Sync keybindings from config
 function M.sync_keybindings()
   if not keybinding_sync then
-    keybinding_sync = require('custom.plugins.tutorial.keybinding-sync')
+    keybinding_sync = require('custom.tutorial.keybinding-sync')
   end
 
   keybinding_sync.sync()
@@ -174,7 +174,7 @@ end
 -- Check and sync keybindings on startup (with notification)
 function M.check_and_sync_keybindings()
   if not keybinding_sync then
-    keybinding_sync = require('custom.plugins.tutorial.keybinding-sync')
+    keybinding_sync = require('custom.tutorial.keybinding-sync')
   end
 
   local changed = keybinding_sync.check_changes()

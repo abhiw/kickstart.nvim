@@ -3,11 +3,22 @@
 local M = {}
 
 -- Start practice for a specific lesson
-function M.start(tutorial, lesson_index)
+function M.start(tutorial, lesson_index, on_close_callback)
   local lesson = tutorial.lessons[lesson_index + 1]
 
   if not lesson or not lesson.practice then
     vim.notify('No practice available', vim.log.levels.ERROR)
+    return
+  end
+
+  -- If practice has validation tasks, use the validator
+  if lesson.practice.tasks and #lesson.practice.tasks > 0 then
+    local validator = require('custom.tutorial.ui.practice-validator')
+    validator.start({
+      tasks = lesson.practice.tasks,
+      initial_content = lesson.practice.initial_content,
+      on_close = on_close_callback,
+    })
     return
   end
 
@@ -88,6 +99,11 @@ function M.start(tutorial, lesson_index)
     end
     if vim.api.nvim_win_is_valid(practice_win) then
       vim.api.nvim_win_close(practice_win, true)
+    end
+
+    -- Call callback to reopen tutorial
+    if on_close_callback then
+      vim.schedule(on_close_callback)
     end
   end
 

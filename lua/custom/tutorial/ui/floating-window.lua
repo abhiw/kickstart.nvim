@@ -93,7 +93,7 @@ local function mark_complete()
     return
   end
 
-  local progress = require('custom.plugins.tutorial.progress')
+  local progress = require('custom.tutorial.progress')
   progress.mark_completed(state.tutorial.metadata.id, state.current_lesson_index)
 
   vim.notify('Lesson marked as complete!', vim.log.levels.INFO)
@@ -166,11 +166,23 @@ local function start_practice()
     return
   end
 
-  local practice_module = require('custom.plugins.tutorial.ui.practice')
-  practice_module.start(state.tutorial, state.current_lesson_index)
+  -- Save current state
+  local saved_tutorial = state.tutorial
+  local saved_lesson_index = state.current_lesson_index
+
+  -- Close tutorial window temporarily
+  if state.win and vim.api.nvim_win_is_valid(state.win) then
+    vim.api.nvim_win_close(state.win, true)
+  end
+
+  local practice_module = require('custom.tutorial.ui.practice')
+  practice_module.start(state.tutorial, state.current_lesson_index, function()
+    -- Callback to reopen tutorial when practice ends
+    M.open(saved_tutorial, saved_lesson_index)
+  end)
 
   -- Increment practice count
-  local progress = require('custom.plugins.tutorial.progress')
+  local progress = require('custom.tutorial.progress')
   progress.increment_practice_count(state.tutorial.metadata.id)
 end
 
@@ -196,7 +208,7 @@ local function close_window()
   -- Save time spent
   if state.start_time and state.tutorial then
     local elapsed = os.time() - state.start_time
-    local progress = require('custom.plugins.tutorial.progress')
+    local progress = require('custom.tutorial.progress')
     progress.add_time_spent(state.tutorial.metadata.id, elapsed)
   end
 
@@ -219,7 +231,7 @@ function M.open(tutorial, lesson_index)
   state.start_time = os.time()
 
   -- Update progress
-  local progress = require('custom.plugins.tutorial.progress')
+  local progress = require('custom.tutorial.progress')
   progress.update_accessed(tutorial.metadata.id)
 
   -- Create buffer

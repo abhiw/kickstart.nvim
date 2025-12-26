@@ -671,7 +671,16 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--header-insertion=iwyu',
+            '--completion-style=detailed',
+            '--function-arg-placeholders',
+          },
+        },
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -724,7 +733,12 @@ require('lazy').setup({
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
         handlers = {
+          -- Default handler for all servers
           function(server_name)
+            -- Skip clangd - we'll configure it with autocmd
+            if server_name == 'clangd' then
+              return
+            end
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -734,6 +748,29 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Configure clangd using native vim.lsp.config (Neovim 0.11+)
+      vim.lsp.config('clangd', {
+        cmd = {
+          'clangd',
+          '--background-index',
+          '--clang-tidy',
+          '--header-insertion=iwyu',
+          '--completion-style=detailed',
+          '--function-arg-placeholders=true',
+        },
+        filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
+        root_markers = { '.clangd', '.clang-tidy', '.clang-format', 'compile_commands.json', 'compile_flags.txt', 'configure.ac', '.git' },
+        capabilities = capabilities,
+      })
+
+      -- Enable clangd for C/C++ files
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
+        callback = function(ev)
+          vim.lsp.enable('clangd', ev.buf)
+        end,
+      })
     end,
   },
 

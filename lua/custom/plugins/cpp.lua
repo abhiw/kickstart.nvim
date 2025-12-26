@@ -23,18 +23,8 @@ return {
   },
 
   ---------------------------------------------------------------------------
-  -- LSP: clangd for C/C++
+  -- NOTE: clangd LSP configuration is in init.lua under the servers table
   ---------------------------------------------------------------------------
-  {
-    'neovim/nvim-lspconfig',
-    opts = {
-      servers = {
-        clangd = {
-          cmd = { 'clangd', '--background-index', '--clang-tidy' },
-        },
-      },
-    },
-  },
 
   ---------------------------------------------------------------------------
   -- Formatting: clang-format via conform.nvim (or any formatter plugin you prefer)

@@ -204,7 +204,7 @@ end
 
 -- Get dashboard data (summary of all tutorials)
 function M.get_dashboard()
-  local tutorial_module = require('custom.plugins.tutorial')
+  local tutorial_module = require('custom.tutorial')
   local tutorials = tutorial_module.get_all_tutorials()
   local dashboard = {}
 

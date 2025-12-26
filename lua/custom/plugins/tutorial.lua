@@ -13,7 +13,7 @@ return {
   },
   config = function()
     -- Load the tutorial module
-    local tutorial = require('custom.plugins.tutorial')
+    local tutorial = require('custom.tutorial')
 
     -- Register commands
     vim.api.nvim_create_user_command('Tutorials', function()
