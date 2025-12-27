@@ -22,8 +22,11 @@ local function format_lesson(tutorial, lesson_index)
 
   -- Header
   table.insert(lines, '╔════════════════════════════════════════════════════════════════╗')
-  table.insert(lines, string.format('║  %s', tutorial.metadata.title))
-  table.insert(lines, string.format('║  Lesson %d/%d: %s', lesson_index + 1, #tutorial.lessons, lesson.title))
+  -- Use only first line of title if it contains newlines
+  local tutorial_title = vim.split(tutorial.metadata.title, '\n')[1]
+  local lesson_title = vim.split(lesson.title, '\n')[1]
+  table.insert(lines, string.format('║  %s', tutorial_title))
+  table.insert(lines, string.format('║  Lesson %d/%d: %s', lesson_index + 1, #tutorial.lessons, lesson_title))
   table.insert(lines, '╚════════════════════════════════════════════════════════════════╝')
   table.insert(lines, '')
 
@@ -41,7 +44,15 @@ local function format_lesson(tutorial, lesson_index)
   if lesson.practice then
     table.insert(lines, '## Practice')
     table.insert(lines, '')
-    table.insert(lines, lesson.practice.instructions or '')
+
+    -- Split instructions if they contain newlines
+    if lesson.practice.instructions then
+      local instruction_lines = vim.split(lesson.practice.instructions, '\n')
+      for _, line in ipairs(instruction_lines) do
+        table.insert(lines, line)
+      end
+    end
+
     table.insert(lines, '')
 
     if lesson.practice.type == 'interactive' then
@@ -124,14 +135,21 @@ local function show_hints()
   end
 
   local hints = lesson.practice.hints
-  local hint_text = table.concat(hints, '\n• ')
 
   -- Show hints in a small floating window
   local hint_buf = vim.api.nvim_create_buf(false, true)
   local hint_lines = { 'Hints:', '' }
 
   for _, hint in ipairs(hints) do
-    table.insert(hint_lines, '• ' .. hint)
+    -- Split hints if they contain newlines
+    local hint_split = vim.split(hint, '\n')
+    for i, hint_line in ipairs(hint_split) do
+      if i == 1 then
+        table.insert(hint_lines, '• ' .. hint_line)
+      else
+        table.insert(hint_lines, '  ' .. hint_line)
+      end
+    end
   end
 
   vim.api.nvim_buf_set_lines(hint_buf, 0, -1, false, hint_lines)

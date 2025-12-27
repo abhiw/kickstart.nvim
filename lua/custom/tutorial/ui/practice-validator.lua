@@ -108,7 +108,14 @@ local function update_instructions()
 
   -- Hint if available
   if task.hint then
-    table.insert(lines, '💡 Hint: ' .. task.hint)
+    local hint_lines = vim.split(task.hint, '\n')
+    for i, hint_line in ipairs(hint_lines) do
+      if i == 1 then
+        table.insert(lines, '💡 Hint: ' .. hint_line)
+      else
+        table.insert(lines, '        ' .. hint_line)
+      end
+    end
     table.insert(lines, '')
   end
 

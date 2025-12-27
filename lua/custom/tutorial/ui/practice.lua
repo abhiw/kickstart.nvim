@@ -59,14 +59,29 @@ function M.start(tutorial, lesson_index, on_close_callback)
   local instruction_lines = {
     '╔═══ Practice Instructions ═══╗',
     '',
-    lesson.practice.instructions or 'Practice the lesson content',
-    '',
   }
+
+  -- Split instructions if they contain newlines
+  local instructions_text = lesson.practice.instructions or 'Practice the lesson content'
+  local instructions_split = vim.split(instructions_text, '\n')
+  for _, line in ipairs(instructions_split) do
+    table.insert(instruction_lines, line)
+  end
+
+  table.insert(instruction_lines, '')
 
   if lesson.practice.hints then
     table.insert(instruction_lines, 'Hints:')
     for _, hint in ipairs(lesson.practice.hints) do
-      table.insert(instruction_lines, '  • ' .. hint)
+      -- Split hints if they contain newlines
+      local hint_lines = vim.split(hint, '\n')
+      for i, hint_line in ipairs(hint_lines) do
+        if i == 1 then
+          table.insert(instruction_lines, '  • ' .. hint_line)
+        else
+          table.insert(instruction_lines, '    ' .. hint_line)
+        end
+      end
     end
     table.insert(instruction_lines, '')
   end

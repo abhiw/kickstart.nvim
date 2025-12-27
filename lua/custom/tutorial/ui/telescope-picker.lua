@@ -70,13 +70,26 @@ function M.open(opts)
           local lines = {}
 
           -- Metadata section
-          table.insert(lines, '# ' .. tutorial.metadata.title)
+          -- Split title if it contains newlines
+          local title_lines = vim.split(tutorial.metadata.title, '\n')
+          table.insert(lines, '# ' .. title_lines[1])
+          for i = 2, #title_lines do
+            table.insert(lines, title_lines[i])
+          end
+
           table.insert(lines, '')
           table.insert(lines, '**Category:** ' .. tutorial.metadata.category)
           table.insert(lines, '**Difficulty:** ' .. tutorial.metadata.difficulty)
           table.insert(lines, '**Estimated Time:** ' .. (tutorial.metadata.estimated_time or 'N/A'))
           table.insert(lines, '')
-          table.insert(lines, tutorial.metadata.description or '')
+
+          -- Split description if it contains newlines
+          local description = tutorial.metadata.description or ''
+          local desc_lines = vim.split(description, '\n')
+          for _, line in ipairs(desc_lines) do
+            table.insert(lines, line)
+          end
+
           table.insert(lines, '')
           table.insert(lines, '---')
           table.insert(lines, '')
@@ -91,7 +104,9 @@ function M.open(opts)
           for i, lesson in ipairs(tutorial.lessons) do
             local is_completed = vim.tbl_contains(completed_lessons, i - 1)
             local lesson_icon = is_completed and '✓' or '•'
-            table.insert(lines, string.format('%s Lesson %d: %s', lesson_icon, i, lesson.title))
+            -- Split lesson title if it contains newlines (use only first line for list)
+            local lesson_title = vim.split(lesson.title, '\n')[1]
+            table.insert(lines, string.format('%s Lesson %d: %s', lesson_icon, i, lesson_title))
           end
 
           table.insert(lines, '')

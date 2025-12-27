@@ -120,7 +120,10 @@ function M.show_progress()
                        item.status == 'in_progress' and '◐' or '○'
     local completion = item.completion_percentage or 0
 
-    table.insert(lines, string.format('%s [%s] %s', status_icon, item.category, item.title))
+    -- Use only first line of title/category if they contain newlines
+    local title = vim.split(item.title, '\n')[1]
+    local category = vim.split(item.category, '\n')[1]
+    table.insert(lines, string.format('%s [%s] %s', status_icon, category, title))
     table.insert(lines, string.format('   Progress: %d%% | Lessons: %d/%d',
       completion, item.lessons_completed or 0, item.total_lessons or 0))
 
