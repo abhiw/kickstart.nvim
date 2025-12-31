@@ -755,14 +755,14 @@ Press 'v' to verify.]],
             end,
           },
           {
-            instruction = [[Step 4: Move right 10 characters with '10l'
+            instruction = [[Step 4: Move right 20 characters with '20l'
 
 On line 14 (the alphabet line), start at 'a'.
-Type '10l' to move right 10 characters.
+Type '20l' to move right 20 characters.
 You should land on 'k'.
 
 Press 'v' to check.]],
-            hint = 'l moves right one character, 10l moves right 10',
+            hint = 'l moves right one character, 20l moves right 20',
             validate = function()
               local pos = vim.api.nvim_win_get_cursor(0)
               local line = vim.api.nvim_buf_get_lines(0, pos[1] - 1, pos[1], false)[1]

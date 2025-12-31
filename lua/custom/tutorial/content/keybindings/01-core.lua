@@ -67,7 +67,9 @@ Ctrl-h          " Move back to left window
       practice = {
         type = 'reference',
         instructions = [[
-Practice window navigation:
+Window navigation requires multiple windows to practice effectively.
+
+Practice in your normal Neovim workflow:
 
 1. Open a split: :split
 2. Press Ctrl-j to move to lower window
@@ -76,13 +78,14 @@ Practice window navigation:
 5. Use Ctrl-h and Ctrl-l to navigate
 6. Close windows: Ctrl-w q
 
-Try creating complex layouts and navigating between them.
+Note: This is a reference lesson. Practice with real files for best results.
         ]],
         hints = {
           'Ctrl-h/j/k/l mirrors Vim hjkl motions',
           'Works with any number of splits',
           ':split creates horizontal split',
           ':vsplit creates vertical split',
+          'Practice with real files for muscle memory',
         },
       },
     },
@@ -126,23 +129,44 @@ vim.opt.incsearch = true    -- Show matches as you type
 - Use `n` and `N` to navigate without triggering new highlights
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice search highlighting:
+        type = 'interactive',
+        instructions = 'Learn the search highlighting workflow.',
+        initial_content = {
+          '──── Search Highlighting Practice ────',
+          '',
+          'The word practice appears multiple times.',
+          'First practice occurrence.',
+          'Second practice here.',
+          'Third practice instance.',
+          '',
+          'Try: /practice to search',
+          'Then: Esc to clear highlights',
+          '',
+          '───────────────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Understanding Search Highlighting
 
-1. Search for a word: /word
-2. Notice all matches are highlighted
-3. Press n to jump to next match
-4. Press Esc to clear highlights
-5. Search for something else: /another
-6. Press Esc again to clear
+When you search with /pattern, Vim highlights all matches.
+Your config maps Esc to clear these highlights automatically.
 
-Clean and simple!
-        ]],
+Default command would be: :nohlsearch
+Your config shortcut: just press Esc
+
+This makes clearing highlights effortless!
+Press 'v' when ready to continue.]],
+            hint = 'Esc is mapped to clear search highlights',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           'Esc clears search highlights',
           '/pattern starts a new search',
-          'n and N navigate without triggering highlights',
+          'n and N navigate matches',
+          'Much faster than :nohlsearch',
         },
       },
     },
@@ -195,24 +219,51 @@ After opening with `<leader>q`:
 - Combine with LSP code actions to fix issues
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice diagnostic navigation:
+        type = 'interactive',
+        instructions = 'Learn diagnostic quickfix workflow.',
+        initial_content = {
+          '──── Diagnostics Quickfix ────',
+          '',
+          'Keybinding: <leader>q (Space + q)',
+          '',
+          'What it does:',
+          '• Opens quickfix list with all diagnostics',
+          '• Shows errors, warnings, info, hints',
+          '• Allows quick navigation to issues',
+          '',
+          'Quickfix navigation:',
+          '• Enter - Jump to diagnostic',
+          '• :cn - Next item',
+          '• :cp - Previous item',
+          '• :cclose - Close quickfix',
+          '',
+          '───────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Diagnostic Quickfix Overview
 
-1. Open a file with errors/warnings
-2. Press Space then q to open quickfix
-3. Navigate the list with j/k
-4. Press Enter to jump to diagnostic
-5. Use :cn and :cp to move between items
-6. Close with :cclose
+<leader>q (Space + q) opens the diagnostic quickfix list.
 
-Very useful for code review workflow!
-        ]],
+This shows all LSP diagnostics in the current buffer:
+• Errors (problems that prevent code from working)
+• Warnings (potential issues)
+• Info messages (suggestions)
+• Hints (optimization tips)
+
+Use quickfix to systematically review and fix issues.
+Press 'v' when you understand this workflow.]],
+            hint = 'Space + q opens diagnostic quickfix list',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           'Space + q opens diagnostic quickfix',
-          'Enter jumps to diagnostic',
-          ':cn next, :cp previous',
-          ':cclose closes quickfix window',
+          'Requires LSP to be running',
+          'Great for reviewing all errors at once',
+          'Use before committing code',
         },
       },
     },
@@ -264,24 +315,56 @@ After pressing `Esc Esc`:
 - Use window navigation (Ctrl-h/j/k/l) to leave terminal window
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice terminal mode:
+        type = 'interactive',
+        instructions = 'Learn terminal mode navigation.',
+        initial_content = {
+          '──── Terminal Mode Exit ────',
+          '',
+          'Keybinding: Esc Esc (double press)',
+          '',
+          'What it does:',
+          '• Exits terminal mode to normal mode',
+          '• Allows you to navigate terminal output',
+          '• Much easier than default Ctrl-\\ Ctrl-n',
+          '',
+          'Terminal workflow:',
+          '1. :terminal - Open built-in terminal',
+          '2. Run commands normally',
+          '3. Esc Esc - Exit to normal mode',
+          '4. Navigate with hjkl, yank text',
+          '5. i or a - Return to terminal mode',
+          '',
+          '───────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Terminal Mode Overview
 
-1. Open terminal: :terminal
-2. Run a command: ls or dir
-3. Press Esc Esc to exit terminal mode
-4. Navigate terminal output with hjkl
-5. Press i to go back to terminal mode
-6. Exit terminal: type 'exit' or close window
+Neovim has a built-in terminal emulator (:terminal).
 
-Useful for quick shell commands without leaving Neovim!
-        ]],
+When in terminal mode, all input goes to the shell.
+To use Vim commands, you need to exit terminal mode.
+
+Default exit: Ctrl-\\ Ctrl-n (awkward!)
+Your config: Esc Esc (much better!)
+
+After exiting to normal mode:
+• Navigate terminal output with hjkl
+• Yank text from terminal
+• Press i/a to return to terminal mode
+
+Press 'v' when you understand this.]],
+            hint = 'Esc Esc exits terminal mode',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           ':term opens built-in terminal',
           'Esc Esc exits to normal mode',
           'i or a returns to terminal mode',
-          'Close with :q or by exiting shell',
+          'Great for quick shell commands',
         },
       },
     },
@@ -344,23 +427,60 @@ If no formatter is configured, falls back to LSP formatting.
 - Visual mode: select text, then `<leader>f` to format selection
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice formatting:
+        type = 'interactive',
+        instructions = 'Learn code formatting workflow.',
+        initial_content = {
+          '──── Code Formatting ────',
+          '',
+          'Keybinding: <leader>f (Space + f)',
+          '',
+          'What it does:',
+          '• Formats entire buffer',
+          '• Uses configured formatter for filetype',
+          '• Falls back to LSP if no formatter',
+          '• Works on visual selections too',
+          '',
+          'Common formatters:',
+          '• JavaScript/TypeScript - Prettier',
+          '• Lua - Stylua',
+          '• C/C++ - clang-format',
+          '• Python - black/autopep8',
+          '• Go - gofmt',
+          '',
+          '───────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Code Formatting Overview
 
-1. Open a code file
-2. Make some formatting messy (bad indentation, etc.)
-3. Press Space then f to format
-4. Watch it auto-fix indentation and style
-5. Try in visual mode: select code, Space f
+<leader>f (Space + f) formats your code automatically.
 
-Formatting should be effortless!
-        ]],
+Your config uses conform.nvim which:
+• Detects filetype automatically
+• Runs appropriate formatter
+• Falls back to LSP formatting if needed
+• Can format visual selections
+
+When to format:
+• Before committing code
+• After major edits
+• When code style is messy
+• To enforce team conventions
+
+Many configs enable format-on-save automatically.
+
+Press 'v' when you understand this workflow.]],
+            hint = 'Space + f formats current buffer',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           'Space + f formats current buffer',
-          'Uses conform.nvim with configured formatters',
-          'Falls back to LSP if no formatter found',
-          'Can format selections in visual mode',
+          'Uses conform.nvim with formatters',
+          'Falls back to LSP formatting',
+          'Works on visual selections',
         },
       },
     },

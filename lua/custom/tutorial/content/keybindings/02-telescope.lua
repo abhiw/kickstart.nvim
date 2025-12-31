@@ -67,24 +67,63 @@ Telescope uses smart fuzzy matching:
 - Fuzzy matching is very forgiving
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice basic Telescope usage:
+        type = 'interactive',
+        instructions = 'Learn Telescope fuzzy finder basics.',
+        initial_content = {
+          '──── Telescope Overview ────',
+          '',
+          'Pattern: <leader>s* (Space + s + key)',
+          '',
+          'Essential commands:',
+          '• Space + s + f - [S]earch [F]iles',
+          '• Space + s + g - [S]earch by [G]rep',
+          '• Space + s + h - [S]earch [H]elp',
+          '• Space + Space - Find buffers',
+          '',
+          'Navigation in Telescope:',
+          '• Type to filter (fuzzy matching)',
+          '• Ctrl-n/Down - Next result',
+          '• Ctrl-p/Up - Previous result',
+          '• Enter - Open',
+          '• Esc - Close',
+          '',
+          'Opening options:',
+          '• Ctrl-x - Horizontal split',
+          '• Ctrl-v - Vertical split',
+          '• Ctrl-t - New tab',
+          '',
+          '────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Telescope Fuzzy Finder Overview
 
-1. Press Space + s + f to search files
-2. Type partial filename to filter
-3. Use Ctrl-n/Ctrl-p or arrow keys to navigate
-4. Press Enter to open file
-5. Try Space + s + g to search for text
-6. Type a word to grep for it across files
+Telescope is your primary tool for finding anything in Neovim.
 
-Get comfortable with the UI first!
-        ]],
+All commands start with <leader>s (Space + s):
+• Space + s + f = Search Files
+• Space + s + g = Search by Grep (text in files)
+• Space + s + h = Search Help documentation
+• Space + Space = Find open buffers
+
+The pattern is mnemonic: s + first letter of what you're searching.
+
+Fuzzy matching means you don't need exact text:
+• "fbr" matches "FooBarBaz"
+• "init.l" matches "init.lua"
+
+Press 'v' when you understand this workflow.]],
+            hint = 'Space + s is the search prefix for all Telescope commands',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
-          'Space + s is the search prefix',
+          'Space + s is the search namespace',
+          'Mnemonic: s + first letter (sf=files, sg=grep)',
           'Fuzzy matching is very forgiving',
-          'Enter opens, Esc closes',
-          'Ctrl-x/v for splits, Ctrl-t for tab',
+          'Ctrl-n/p to navigate, Enter to open',
         },
       },
     },
@@ -133,24 +172,62 @@ To search hidden files, you may need to adjust telescope config.
 - Respects .gitignore (won't show node_modules, etc.)
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice file finding:
+        type = 'interactive',
+        instructions = 'Learn file finding with Telescope.',
+        initial_content = {
+          '──── File Finding ────',
+          '',
+          'Keybinding: <leader>sf (Space + s + f)',
+          '',
+          'What it does:',
+          '• Opens list of all files in project',
+          '• Respects .gitignore by default',
+          '• Uses fuzzy matching for filtering',
+          '',
+          'Workflow:',
+          '1. Space + s + f',
+          '2. Type part of filename',
+          '3. Ctrl-n/p to navigate',
+          '4. Enter to open',
+          '',
+          'Fuzzy examples:',
+          '• "uc" finds "user_controller.rb"',
+          '• "btn" finds "Button.tsx"',
+          '• "comp/b" finds "components/Button"',
+          '',
+          '──────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[File Finding with Telescope
 
-1. Space + s + f
-2. Type part of a filename you know exists
-3. Watch fuzzy matching narrow results
-4. Open the file with Enter
-5. Try very short queries (2-3 chars)
-6. Notice how fast it is!
+<leader>sf (Space + s + f) is the fastest way to navigate files.
 
-This should become your primary navigation method.
-        ]],
+It searches ALL files in your project and uses fuzzy matching:
+• Don't type full names - use shortcuts
+• "uc" can find "user_controller.rb"
+• "btn" can find "Button.tsx"
+
+Respects .gitignore so you won't see:
+• node_modules/
+• .git/
+• build artifacts
+
+This should become your primary file navigation method.
+Much faster than :edit or file trees!
+
+Press 'v' when you understand this workflow.]],
+            hint = 'Space + s + f = fastest file navigation',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           'Space + s + f finds files',
-          'Fuzzy matching is smart - use short queries',
-          'Respects .gitignore',
-          'Much faster than :edit or file browser',
+          'Fuzzy matching - use 2-3 char shortcuts',
+          'Respects .gitignore automatically',
+          'Fastest navigation method',
         },
       },
     },
@@ -203,24 +280,66 @@ Uses ripgrep (rg) for lightning-fast searching.
 - Can preview file in telescope pane
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice live grep:
+        type = 'interactive',
+        instructions = 'Learn live grep for searching text.',
+        initial_content = {
+          '──── Live Grep ────',
+          '',
+          'Keybinding: <leader>sg (Space + s + g)',
+          '',
+          'What it does:',
+          '• Searches TEXT CONTENT across all files',
+          '• Uses ripgrep (extremely fast)',
+          '• Results update as you type (live)',
+          '• Respects .gitignore',
+          '',
+          'Comparison:',
+          '• Space + s + f = Search file NAMES',
+          '• Space + s + g = Search file CONTENTS',
+          '',
+          'Use cases:',
+          '• Find where function is called',
+          '• Search for TODO comments',
+          '• Find error messages',
+          '• Grep any text in codebase',
+          '',
+          '──────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Live Grep - Search File Contents
 
-1. Space + s + g
-2. Type a word that appears in multiple files
-3. Watch results appear instantly
-4. Notice file paths and line numbers
-5. Navigate to a result and press Enter
-6. Try searching for "function" or "TODO"
+<leader>sg (Space + s + g) searches TEXT inside files.
 
-This is incredibly powerful for code navigation!
-        ]],
+How it works:
+• Type any text to search for
+• Results appear instantly as you type
+• Shows: filename, line number, and context
+• Navigate with Ctrl-n/p, Enter to open
+
+Uses ripgrep which is incredibly fast:
+• Can search millions of lines in seconds
+• Respects .gitignore automatically
+• Supports regex patterns
+
+Essential for:
+• Finding function usages
+• Searching for TODOs
+• Debugging error messages
+• Code archaeology
+
+Press 'v' when you understand this powerful tool.]],
+            hint = 'Space + s + g = grep text across entire project',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
-          'Space + s + g searches text content',
-          'Live results as you type',
-          'Uses ripgrep (super fast)',
-          'Shows file, line number, and context',
+          'Space + s + g searches file contents',
+          'Live results with ripgrep',
+          'Shows context around matches',
+          'Essential for code navigation',
         },
       },
     },
@@ -272,23 +391,66 @@ Use `<leader>sw` for quick text search.
 - Combine with word motions: `w` to next word, `<leader>sw`
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice searching current word:
+        type = 'interactive',
+        instructions = 'Learn to search word under cursor.',
+        initial_content = {
+          '──── Search Current Word ────',
+          '',
+          'Keybinding: <leader>sw (Space + s + w)',
+          '',
+          'What it does:',
+          '• Greps for word under cursor',
+          '• Pre-fills search with current word',
+          '• Shows all occurrences in project',
+          '',
+          'Workflow:',
+          '1. Put cursor on any word',
+          '2. Space + s + w',
+          '3. Telescope opens with results',
+          '',
+          'Comparison:',
+          '• LSP grr - Language-aware references',
+          '• <leader>sw - Text-based search',
+          '',
+          'Use LSP for precise code navigation.',
+          'Use <leader>sw for quick text searches.',
+          '',
+          '──────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Search Current Word
 
-1. Open a code file
-2. Put cursor on a variable or function name
-3. Press Space + s + w
-4. See all occurrences instantly
-5. Jump to one with Enter
-6. Try on different words
+<leader>sw (Space + s + w) searches for the word under cursor.
 
-Very handy for quick searches!
-        ]],
+How to use:
+1. Position cursor on any word (variable, function, etc.)
+2. Press Space + s + w
+3. Telescope opens showing all occurrences
+
+Difference from LSP:
+• LSP (grr) - Language-aware, finds symbol references
+• <leader>sw - Text-based, finds any matching text
+
+Benefits:
+• Much faster than manually typing in grep
+• Great for "where is this word used?"
+• Works on ANY word, even comments
+• No LSP required
+
+Perfect for quick searches!
+
+Press 'v' when you understand.]],
+            hint = 'Space + s + w = grep word under cursor',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
           'Space + s + w searches word under cursor',
-          'Faster than typing in live grep',
-          'Text-based (not language-aware like LSP)',
+          'Text-based search (not language-aware)',
+          'Faster than manual grep',
           'Works on any word',
         },
       },
@@ -351,25 +513,67 @@ New to a feature?
 - Help files are comprehensive - use them!
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice help and keymap search:
+        type = 'interactive',
+        instructions = 'Learn help and keymap search.',
+        initial_content = {
+          '──── Help & Keymaps Search ────',
+          '',
+          'Two essential discovery tools:',
+          '',
+          '<leader>sh (Space + s + h)',
+          '• [S]earch [H]elp documentation',
+          '• Find help on any Neovim topic',
+          '• Opens help in split window',
+          '',
+          '<leader>sk (Space + s + k)',
+          '• [S]earch [K]eymaps',
+          '• Lists ALL configured keybindings',
+          '• Shows mode and description',
+          '• Discover what keys do',
+          '',
+          'Learning workflow:',
+          '1. Search help for topic',
+          '2. Read documentation',
+          '3. Search keymaps to find shortcuts',
+          '4. Practice!',
+          '',
+          '───────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Help and Keymap Discovery
 
-1. Space + s + h
-2. Search for "telescope"
-3. Open a help tag and read
-4. Close help with :q
-5. Space + s + k
-6. Search for "leader" to see all leader keymaps
-7. Explore what's available!
+Two commands for learning:
 
-These are great learning tools.
-        ]],
+<leader>sh (Space + s + h) - Search Help
+• Searches Neovim's comprehensive help system
+• Example: search "telescope" for telescope help
+• Opens help documentation in split window
+
+<leader>sk (Space + s + k) - Search Keymaps
+• Lists ALL your configured keybindings
+• Filter by typing (e.g., "telescope", "lsp")
+• Shows mode, key, and description
+• Perfect for discovering what keys you have
+
+These are your learning tools!
+Use them whenever you want to:
+• Learn a new feature
+• Remember a forgotten keybinding
+• Discover what's possible
+
+Press 'v' when ready.]],
+            hint = 'sh=help docs, sk=keymap list',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
-          'Space + s + h searches help docs',
-          'Space + s + k searches keymaps',
-          'Great for learning and discovering features',
-          'Help docs are very comprehensive',
+          'Space + s + h searches help',
+          'Space + s + k lists all keymaps',
+          'Essential for learning and discovery',
+          'Help docs are comprehensive',
         },
       },
     },
@@ -448,24 +652,83 @@ Live grep but only in currently open buffers.
 - Each has its use case - experiment to find favorites
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice other searches:
+        type = 'interactive',
+        instructions = 'Learn additional Telescope searches.',
+        initial_content = {
+          '──── Other Telescope Searches ────',
+          '',
+          'Quick reference of other useful searches:',
+          '',
+          '<leader><leader> (Space twice)',
+          '• Find existing buffers',
+          '• Fastest buffer switching',
+          '',
+          '<leader>s. (Space + s + .)',
+          '• Search recent files (oldfiles)',
+          '• Return to recently edited files',
+          '',
+          '<leader>sr (Space + s + r)',
+          '• Resume last search',
+          '• Brings back previous search query',
+          '',
+          '<leader>sd (Space + s + d)',
+          '• Search diagnostics',
+          '• Alternative to quickfix list',
+          '',
+          '<leader>sn (Space + s + n)',
+          '• Search Neovim config files',
+          '• Quick config editing',
+          '',
+          '<leader>/ (Space + /)',
+          '• Fuzzy search in current buffer',
+          '',
+          '───────────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Additional Telescope Searches
 
-1. Open multiple files
-2. Space + Space (double leader) to list buffers
-3. Switch to another buffer
-4. Space + s + . to see recent files
-5. Space + s + r to resume last search
-6. Space + s + n to search config files
+More specialized searches for specific workflows:
 
-Each search has its sweet spot - find yours!
-        ]],
+<leader><leader> - Buffer List
+• Double tap Space to list all open buffers
+• Fastest way to switch between files
+• Much better than :buffers
+
+<leader>s. - Recent Files
+• Shows recently opened files (oldfiles)
+• Great for returning to yesterday's work
+
+<leader>sr - Resume Last Search
+• Brings back your previous telescope search
+• Perfect when you need multiple results from same search
+
+<leader>sd - Search Diagnostics
+• Lists all errors/warnings with Telescope UI
+• Alternative to quickfix (<leader>q)
+
+<leader>sn - Search Config
+• Scoped to ~/.config/nvim directory
+• Quick way to edit your config
+
+<leader>/ - In-Buffer Search
+• Fuzzy search within current file
+• Better UI than regular / search
+
+Each has its use case - experiment to find your favorites!
+
+Press 'v' when ready.]],
+            hint = 'Many specialized searches - use what fits your workflow',
+            validate = function()
+              return true
+            end,
+          },
+        },
         hints = {
-          'Double Space lists buffers',
-          'Space + s + . for recent files',
-          'Space + s + r resumes last search',
-          'Space + s + n searches neovim config',
+          'Double Space = buffers (most used!)',
+          's. = recent, sr = resume, sd = diagnostics',
+          'sn = config files, / = in-buffer search',
+          'Experiment to find your favorites',
         },
       },
     },

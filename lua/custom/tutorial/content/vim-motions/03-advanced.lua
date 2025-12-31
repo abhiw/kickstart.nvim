@@ -72,31 +72,110 @@ Execute with: `999@a` (will stop at end of file)
 - Use `. (dot)` for simple repetition, macros for complex
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice recording and playing macros:
+        type = 'interactive',
+        instructions = 'Record a macro and apply it to multiple lines.',
+        initial_content = {
+          '──── Macro Practice ────',
+          '',
+          'apple',
+          'banana',
+          'cherry',
+          'date',
+          '',
+          'Instructions:',
+          'Record a macro to add "- " at the start of each line',
+          'Then apply it to all fruit lines above',
+          '',
+          '───────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Record a macro to add "- " prefix
 
-1. Record a macro to add quotes around a word:
-   - qa (start recording)
-   - bi" (insert quote before word)
-   - ea" (insert quote after word)
-   - j (move to next line)
-   - q (stop recording)
+We'll record a macro that:
+1. Goes to start of line (0)
+2. Inserts "- " (I- <space><Esc>)
+3. Moves to next line (j)
 
-2. Play it: @a
+Position on line 3 (apple), then:
+1. Press qa (start recording into register 'a')
+2. Press 0 (go to line start)
+3. Press I (insert at start)
+4. Type: - <space>
+5. Press Esc
+6. Press j (move to next line)
+7. Press q (stop recording)
 
-3. Play it 5 times: 5@a
+The line should now read: "- apple"
+Press 'v' to verify.]],
+            hint = 'qa 0 I- <space> <Esc> j q',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 3, expected = '- apple' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 2: Play the macro with '@a'
 
-4. Try @@  to replay last macro
+Now use the macro on the next line!
+You should be on line 4 (banana).
 
-5. View your macro: :reg a
-        ]],
+1. Press @a (play macro from register 'a')
+
+The line should become: "- banana"
+Press 'v' to check.]],
+            hint = 'Press: @a',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 4, expected = '- banana' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 3: Replay with '@@'
+
+The @@ command replays the last macro.
+You should be on line 5 (cherry).
+
+1. Press @@ (replay last macro)
+
+The line should become: "- cherry"
+Press 'v' to verify.]],
+            hint = 'Press: @@',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 5, expected = '- cherry' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 4: Apply to last line
+
+One more time! You should be on line 6 (date).
+
+1. Press @@ or @a
+
+The line should become: "- date"
+Press 'v' to check. Excellent work with macros!]],
+            hint = 'Press: @@ or @a',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 6, expected = '- date' },
+              })
+            end,
+          },
+        },
         hints = {
           'q{letter} starts recording, q stops',
           '@{letter} plays the macro',
           '@@ replays last macro',
-          'Use counts: 10@a plays macro 10 times',
           'Make macros repeatable: end with j or w',
+          ':reg a shows macro content',
         },
       },
     },
@@ -167,24 +246,102 @@ Access system clipboard:
 - Named registers great for cut/paste between files
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice using registers:
+        type = 'interactive',
+        instructions = 'Practice yanking to named registers and pasting from them.',
+        initial_content = {
+          '──── Register Practice ────',
+          '',
+          'TEXT A: Yank this to register a',
+          'TEXT B: Yank this to register b',
+          '',
+          'Paste line A below:',
+          '',
+          '',
+          'Paste line B below:',
+          '',
+          '',
+          '───────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Yank line to register 'a'
 
-1. Yank a line to register a: "ayy
-2. Yank another line to register b: "byy
-3. View registers: :reg
-4. Paste from register a: "ap
-5. Paste from register b: "bp
-6. Try appending: "Ayy (uppercase A)
-7. Yank to system clipboard: "+yy
-8. Paste from system clipboard: "+p
-        ]],
+Position your cursor on line 3 (TEXT A).
+
+1. Navigate to line 3
+2. Press "ayy (quote, then a, then yy)
+
+This yanks the entire line to register 'a'.
+You won't see any visual change yet.
+Press 'v' when ready.]],
+            hint = 'Line 3, then: "ayy',
+            validate = function()
+              -- We can't easily validate the register content directly,
+              -- so we just check they're on the right line
+              local pos = vim.api.nvim_win_get_cursor(0)
+              return pos[1] == 3
+            end,
+          },
+          {
+            instruction = [[Step 2: Yank line to register 'b'
+
+Position your cursor on line 4 (TEXT B).
+
+1. Navigate to line 4
+2. Press "byy
+
+This yanks the line to register 'b'.
+Press 'v' to continue.]],
+            hint = 'Line 4, then: "byy',
+            validate = function()
+              local pos = vim.api.nvim_win_get_cursor(0)
+              return pos[1] == 4
+            end,
+          },
+          {
+            instruction = [[Step 3: Paste from register 'a'
+
+Navigate to line 7 (the empty line after "Paste line A below:").
+
+1. Go to line 7
+2. Press "ap (quote, then a, then p)
+
+This pastes the content from register 'a'.
+The line should now show: TEXT A: Yank this to register a
+Press 'v' to verify.]],
+            hint = 'Line 7, then: "ap',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 7, expected = 'TEXT A: Yank this to register a' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 4: Paste from register 'b'
+
+Navigate to line 10 (the empty line after "Paste line B below:").
+
+1. Go to line 10
+2. Press "bp
+
+This pastes from register 'b'.
+The line should show: TEXT B: Yank this to register b
+Press 'v' to check. Excellent work with registers!]],
+            hint = 'Line 10, then: "bp',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 10, expected = 'TEXT B: Yank this to register b' },
+              })
+            end,
+          },
+        },
         hints = {
           '"{letter}yy yanks to that register',
           '"{letter}p pastes from that register',
           ':reg shows all registers',
-          '"+ is system clipboard',
+          'Registers let you juggle multiple yanks',
           '"_ is black hole (deletes without saving)',
         },
       },
@@ -235,18 +392,117 @@ Related to change list:
 - Great for reviewing changes before committing
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice change list navigation:
+        type = 'interactive',
+        instructions = 'Make changes and navigate through change list with g; and g,',
+        initial_content = {
+          '──── Change List Navigation ────',
+          '',
+          'Line 3: Make a change here',
+          '',
+          'Some content',
+          'More content',
+          '',
+          'Line 8: Make another change here',
+          '',
+          'Additional content',
+          '',
+          'Line 12: Make a third change here',
+          '',
+          'After making changes, use g; and g, to navigate',
+          '',
+          '────────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Make a change on line 3
 
-1. Make a change at line 5
-2. Make a change at line 15
-3. Make a change at line 25
-4. Press g; to jump to previous change (line 15)
-5. Press g; again to jump to line 5
-6. Press g, to jump forward to line 15
-7. Use :changes to see full change list
-        ]],
+Navigate to line 3 and make a small change to create a change entry.
+
+1. Go to line 3 (3G)
+2. Press A to append at end of line
+3. Type: EDIT1
+4. Press Esc
+
+This creates your first change entry.
+Press 'v' when ready.]],
+            hint = '3G, then: A type EDIT1 <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 3, expected = 'Line 3: Make a change here EDIT1' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 2: Make a change on line 8
+
+Navigate to line 8 and make another change.
+
+1. Go to line 8 (8G)
+2. Press A
+3. Type: EDIT2
+4. Press Esc
+
+This is your second change.
+Press 'v' to continue.]],
+            hint = '8G, then: A type EDIT2 <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 8, expected = 'Line 8: Make another change here EDIT2' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 3: Make a change on line 12
+
+Make a third change on line 12.
+
+1. Go to line 12 (12G)
+2. Press A
+3. Type: EDIT3
+4. Press Esc
+
+Now you have 3 changes in the change list!
+Press 'v' when ready.]],
+            hint = '12G, then: A type EDIT3 <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 12, expected = 'Line 12: Make a third change here EDIT3' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 4: Navigate back with 'g;'
+
+You're currently on line 12 (your last change).
+Press g; to jump to the PREVIOUS change location.
+
+1. Press g;
+
+You should jump to line 8 (where you made EDIT2).
+Press 'v' to verify you're on line 8.]],
+            hint = 'Press: g;',
+            validate = function()
+              local pos = vim.api.nvim_win_get_cursor(0)
+              return pos[1] == 8
+            end,
+          },
+          {
+            instruction = [[Step 5: Continue backward with 'g;'
+
+Press g; again to go to the change before that.
+
+You should jump to line 3 (EDIT1).
+Press 'v' to check. Great work mastering change navigation!]],
+            hint = 'Press: g; again',
+            validate = function()
+              local pos = vim.api.nvim_win_get_cursor(0)
+              return pos[1] == 3
+            end,
+          },
+        },
         hints = {
           'g; jumps to previous change',
           'g, jumps to next change',
@@ -320,35 +576,98 @@ I<spaces>     " Insert spaces
       practice = {
         type = 'interactive',
         instructions = 'Use Ctrl-v to select blocks and edit multiple lines at once.',
-        setup = function()
-          local buf = vim.api.nvim_create_buf(false, true)
-          local lines = {
-            '──── Visual Block Practice ────',
-            '',
-            'const a = 1;',
-            'const b = 2;',
-            'const c = 3;',
-            'const d = 4;',
-            '',
-            'Try: Select "const" column with Ctrl-v jjj',
-            'Then press c to change, or d to delete',
-            '',
-            'name = "Alice"',
-            'age = 30',
-            'city = "NYC"',
-            '',
-            'Try: Add // at start using Ctrl-v jj I// Esc',
-            '',
-            '────────────────────────────────',
-          }
-          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-          vim.bo[buf].modifiable = true
-          return buf
-        end,
+        initial_content = {
+          '──── Visual Block Practice ────',
+          '',
+          'apple',
+          'banana',
+          'cherry',
+          'date',
+          '',
+          'const x = 1;',
+          'const y = 2;',
+          'const z = 3;',
+          '',
+          'function first() {}',
+          'function second() {}',
+          'function third() {}',
+          '',
+          '────────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Add '# ' to the fruit lines using visual block mode
+
+Position your cursor on line 3 (apple).
+1. Press Ctrl-v to start visual block selection
+2. Press jjj to select 4 lines (apple through date)
+3. Press I to insert at the beginning
+4. Type '# ' (hash and space)
+5. Press Esc to apply to all lines
+
+All four fruit lines should now start with '# '.
+Press 'v' to verify.]],
+            hint = 'Ctrl-v to start, jjj to select, I# <space><Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 3, expected = '# apple' },
+                { line = 4, expected = '# banana' },
+                { line = 5, expected = '# cherry' },
+                { line = 6, expected = '# date' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 2: Add comments to function definitions
+
+Position your cursor at line 12 (function first).
+1. Press 0 to go to the start of the line
+2. Press Ctrl-v to start block selection
+3. Press jj to select 3 function lines
+4. Press I to insert at start
+5. Type '// ' (two slashes and space)
+6. Press Esc
+
+The three function lines should now start with '// '.
+Press 'v' to check.]],
+            hint = 'Start at line 12, then: Ctrl-v jj I// <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 12, expected = '// function first() {}' },
+                { line = 13, expected = '// function second() {}' },
+                { line = 14, expected = '// function third() {}' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 3: Delete the 'const ' column
+
+Position cursor at the 'c' in 'const' on line 8.
+1. Press Ctrl-v to start block mode
+2. Press jj to select 3 lines
+3. Press 5l to extend right 6 characters (to include 'const ')
+4. Press x or d to delete the selected block
+
+The lines should now read 'x = 1;', 'y = 2;', 'z = 3;'.
+Press 'v' to verify.]],
+            hint = 'Position on "c" of const, then: Ctrl-v jj 5l d',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 8, expected = 'x = 1;' },
+                { line = 9, expected = 'y = 2;' },
+                { line = 10, expected = 'z = 3;' },
+              })
+            end,
+          },
+        },
         hints = {
           'Ctrl-v starts visual block mode',
           'I inserts at start of all selected lines',
           'A appends at end of all selected lines',
+          'd or x deletes the selected block',
           'Great for editing columns, adding comments',
         },
       },
@@ -360,11 +679,11 @@ I<spaces>     " Insert spaces
       content = [[
 # Advanced Text Objects with mini.ai
 
-Your config has mini.ai plugin installed, which enhances text objects:
+Your config may have mini.ai plugin which enhances text objects:
 
 ## Enhanced Text Objects
 
-Standard plus additional:
+Standard plus additional (if mini.ai is installed):
 - `iq`, `aq` → Quote (any quote type)
 - `ig`, `ag` → Entire buffer
 - `i?`, `a?` → User prompt (asks for char)
@@ -406,22 +725,106 @@ dinw        " Works anywhere - finds NEXT word
 - No need to navigate to object first
 - Combine with counts: d2inw (delete in 2nd next word)
 - Your mini.ai config might have custom objects
+
+Note: This lesson practices standard text objects which work without mini.ai
       ]],
       practice = {
-        type = 'reference',
-        instructions = [[
-Practice mini.ai text objects:
+        type = 'interactive',
+        instructions = 'Practice text objects (works with or without mini.ai plugin).',
+        initial_content = {
+          '──── Advanced Text Objects ────',
+          '',
+          'Test standard text objects:',
+          'word1 word2 word3 word4',
+          '',
+          'Change "this text" to something new',
+          '',
+          'function (param) { code }',
+          '',
+          'const array = [item1, item2];',
+          '',
+          '───────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Delete around a word with 'daw'
 
-1. Try "around" variants: daw, da", da)
-2. Try "next" variants: dinw (next word)
-3. Try treesitter: vaf (visual around function)
-4. Explore: :h mini.ai for all objects
+Position your cursor on "word2" in line 4.
 
-Note: Some objects require treesitter parser
-for the current filetype.
-        ]],
+1. Move cursor anywhere on "word2"
+2. Press daw (delete around word)
+
+The line should become: "word1 word3 word4"
+(Note: daw includes the trailing space)
+Press 'v' to verify.]],
+            hint = 'Cursor on "word2", then: daw',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 4, expected = 'word1 word3 word4' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 2: Change inside quotes with 'ci"'
+
+Position your cursor anywhere inside the quotes on line 6.
+
+1. Cursor anywhere between the quotes
+2. Press ci"
+3. Type: updated
+4. Press Esc
+
+The line should read: Change "updated" to something new
+Press 'v' to check.]],
+            hint = 'Cursor in quotes, then: ci" type text <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 6, expected = 'Change "updated" to something new' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 3: Delete inside parentheses with 'di('
+
+Position your cursor anywhere inside the parentheses on line 8.
+
+1. Cursor anywhere inside ( )
+2. Press di( or di)
+
+The function should become: function () { code }
+Press 'v' to verify.]],
+            hint = 'Cursor in parens, then: di(',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 8, expected = 'function () { code }' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 4: Delete inside brackets with 'di['
+
+Position your cursor anywhere inside the square brackets on line 10.
+
+1. Cursor anywhere inside [ ]
+2. Press di[
+
+The line should become: const array = [];
+Press 'v' to check. Great work!]],
+            hint = 'Cursor in brackets, then: di[',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 10, expected = 'const array = [];' },
+              })
+            end,
+          },
+        },
         hints = {
-          'mini.ai enhances built-in text objects',
+          'Standard text objects work everywhere',
+          'mini.ai adds "next" and "last" variants (if installed)',
           'in{object} = in next, il{object} = in last',
           'Works with treesitter for code objects',
           'Very powerful for quick editing',
@@ -511,41 +914,112 @@ Works with any change!
       practice = {
         type = 'interactive',
         instructions = 'Practice composing operators with motions and text objects.',
-        setup = function()
-          local buf = vim.api.nvim_create_buf(false, true)
-          local lines = {
-            '──── Motion Composition Practice ────',
-            '',
-            'delete this word carefully',
-            'change this entire line please',
-            'yank this useful text here',
-            '',
-            'function example() {',
-            '  const message = "hello world";',
-            '  return message;',
-            '}',
-            '',
-            'Try these combinations:',
-            '• diw - delete inner word',
-            '• ci" - change inside quotes',
-            '• yap - yank a paragraph',
-            '• >i{ - indent inside braces',
-            '• gUaw - uppercase a word',
-            '',
-            'Practice chaining:',
-            'ciw (change word) then press . on other words',
-            '',
-            '──────────────────────────────────────',
-          }
-          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-          vim.bo[buf].modifiable = true
-          return buf
-        end,
+        initial_content = {
+          '──── Motion Composition Practice ────',
+          '',
+          'The quick brown fox jumps over lazy dog',
+          '',
+          'Replace: "old text" should become "new text"',
+          '',
+          'delete_this_word and keep the rest',
+          '',
+          'MAKE THIS lowercase',
+          '',
+          'const value = "change me";',
+          '',
+          '──────────────────────────────────────',
+        },
+        tasks = {
+          {
+            instruction = [[Step 1: Delete a word using 'daw'
+
+Position your cursor anywhere on the word "quick" in line 3.
+1. Press daw (delete a word - includes trailing space)
+
+The line should now read: "The brown fox jumps over lazy dog"
+Press 'v' to verify.]],
+            hint = 'Position cursor on "quick", then press: daw',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 3, expected = 'The brown fox jumps over lazy dog' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 2: Change text inside quotes using 'ci"'
+
+Position your cursor anywhere inside the quotes on line 5.
+1. Press ci" (change inside quotes)
+2. Type: new text
+3. Press Esc
+
+The line should now read: Replace: "new text" should become "new text"
+Press 'v' to verify.]],
+            hint = 'Cursor in quotes, then: ci" type "new text" <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 5, expected = 'Replace: "new text" should become "new text"' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 3: Delete to end of line using 'd$' or 'D'
+
+Position your cursor on the underscore after "delete" in line 7.
+1. Press d$ (or just D)
+
+The line should now read: "delete"
+Press 'v' to verify.]],
+            hint = 'Position on "_", then press: d$ (or D)',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 7, expected = 'delete' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 4: Lowercase a word using 'guaw'
+
+Position your cursor anywhere on "MAKE" in line 9.
+1. Press guaw (lowercase around word)
+
+The line should now read: "make THIS lowercase"
+Press 'v' to check.]],
+            hint = 'Cursor on "MAKE", then: guaw',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 9, expected = 'make THIS lowercase' },
+              })
+            end,
+          },
+          {
+            instruction = [[Step 5: Delete inside quotes and type new text
+
+Position cursor anywhere inside the quotes in line 11 ("change me").
+1. Press ci" (change inside quotes)
+2. Type: updated
+3. Press Esc
+
+The line should read: const value = "updated";
+Press 'v' to verify. Great job!]],
+            hint = 'Cursor in quotes, then: ci" type "updated" <Esc>',
+            validate = function()
+              local validator = require('custom.tutorial.ui.practice-validator').validators
+              return validator.lines_with_feedback({
+                { line = 11, expected = 'const value = "updated";' },
+              })
+            end,
+          },
+        },
         hints = {
           'Operator + motion = powerful editing',
           'd2w deletes 2 words, c$ changes to end',
           'Text objects: diw, ci", ya), vi{',
-          '. (dot) repeats last change',
+          'gu = lowercase, gU = uppercase',
           'Think in grammar: verb + noun',
         },
       },

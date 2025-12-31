@@ -43,7 +43,7 @@ function M.start(tutorial, lesson_index, on_close_callback)
       '',
       'Try using the motions to navigate and edit this text efficiently.',
       '',
-      'Press q to exit practice mode.',
+      'Press quit to exit practice mode.',
       '',
       '─────────────────────',
     }
@@ -86,34 +86,59 @@ function M.start(tutorial, lesson_index, on_close_callback)
     table.insert(instruction_lines, '')
   end
 
-  table.insert(instruction_lines, 'Press q to exit practice')
+  table.insert(instruction_lines, 'Press quit to exit practice')
   table.insert(instruction_lines, '╚═══════════════════════════╝')
 
   vim.api.nvim_buf_set_lines(instruction_buf, 0, -1, false, instruction_lines)
   vim.bo[instruction_buf].modifiable = false
   vim.bo[instruction_buf].buftype = 'nofile'
 
-  -- Split layout: instruction on top, practice on bottom
-  vim.cmd('split')
+  -- Vertical split layout: instruction on left, practice on right
+  -- First set the practice buffer in current window
   local practice_win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(practice_win, practice_buf)
 
-  -- Create instruction window at top
-  vim.cmd('aboveleft split')
+  -- Create instruction window on left
+  vim.cmd('aboveleft vsplit')
   local instruction_win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(instruction_win, instruction_buf)
-  vim.api.nvim_win_set_height(instruction_win, #instruction_lines + 2)
+
+  -- Set width: 50% for instructions, 50% for practice (equal split)
+  local total_width = vim.o.columns
+  local instruction_width = math.floor(total_width * 0.50)
+  local practice_width = total_width - instruction_width - 1
+
+  -- Ensure minimums
+  instruction_width = math.max(instruction_width, 50)
+  practice_width = math.max(practice_width, 50)
+
+  vim.api.nvim_win_set_width(instruction_win, instruction_width)
+  vim.api.nvim_win_set_width(practice_win, practice_width)
 
   -- Focus practice window
   vim.api.nvim_set_current_win(practice_win)
 
   -- Close function
   local function close_practice()
+    -- Focus practice window first
+    if vim.api.nvim_win_is_valid(practice_win) then
+      vim.api.nvim_set_current_win(practice_win)
+    end
+
+    -- Close instruction window
     if vim.api.nvim_win_is_valid(instruction_win) then
       vim.api.nvim_win_close(instruction_win, true)
     end
-    if vim.api.nvim_win_is_valid(practice_win) then
-      vim.api.nvim_win_close(practice_win, true)
+
+    -- Use :only to close all other windows and keep current window
+    vim.cmd('only')
+
+    -- Delete both buffers
+    if vim.api.nvim_buf_is_valid(instruction_buf) then
+      vim.api.nvim_buf_delete(instruction_buf, { force = true })
+    end
+    if vim.api.nvim_buf_is_valid(practice_buf) then
+      vim.api.nvim_buf_delete(practice_buf, { force = true })
     end
 
     -- Call callback to reopen tutorial
@@ -123,8 +148,10 @@ function M.start(tutorial, lesson_index, on_close_callback)
   end
 
   -- Set keymaps to close
-  vim.keymap.set('n', 'q', close_practice, { buffer = practice_buf, nowait = true })
-  vim.keymap.set('n', 'q', close_practice, { buffer = instruction_buf, nowait = true })
+  vim.keymap.set('n', 'quit', close_practice, { buffer = practice_buf, nowait = true, silent = true })
+  vim.keymap.set('n', 'quit', close_practice, { buffer = instruction_buf, nowait = true, silent = true })
+  vim.keymap.set('n', '<Esc>', close_practice, { buffer = practice_buf, nowait = true, silent = true })
+  vim.keymap.set('n', '<Esc>', close_practice, { buffer = instruction_buf, nowait = true, silent = true })
 end
 
 return M

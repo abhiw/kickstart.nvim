@@ -82,6 +82,40 @@ local function check_task_completion()
   return ok and result
 end
 
+-- Resize windows to ensure good visibility
+local function resize_windows()
+  if not state.instruction_win or not vim.api.nvim_win_is_valid(state.instruction_win) then
+    return
+  end
+  if not state.practice_win or not vim.api.nvim_win_is_valid(state.practice_win) then
+    return
+  end
+
+  local total_width = vim.o.columns
+  local available_width = total_width - 2 -- Reserve space for separators
+
+  -- Define minimum widths for readability
+  local min_instruction_width = 50
+  local min_practice_width = 50
+
+  -- Split width: 50% for instructions, 50% for practice (equal split)
+  local instruction_width = math.floor(available_width * 0.50)
+  local practice_width = available_width - instruction_width
+
+  -- Ensure minimums are met
+  instruction_width = math.max(instruction_width, min_instruction_width)
+  practice_width = math.max(practice_width, min_practice_width)
+
+  -- If both minimums can't fit, split equally
+  if instruction_width + practice_width > available_width then
+    instruction_width = math.floor(available_width / 2)
+    practice_width = available_width - instruction_width
+  end
+
+  vim.api.nvim_win_set_width(state.instruction_win, instruction_width)
+  vim.api.nvim_win_set_width(state.practice_win, practice_width)
+end
+
 -- Update instruction window with current task
 local function update_instructions()
   if not state.instruction_buf or not vim.api.nvim_buf_is_valid(state.instruction_buf) then
@@ -127,6 +161,9 @@ local function update_instructions()
   vim.bo[state.instruction_buf].modifiable = true
   vim.api.nvim_buf_set_lines(state.instruction_buf, 0, -1, false, lines)
   vim.bo[state.instruction_buf].modifiable = false
+
+  -- Resize windows after updating content
+  resize_windows()
 end
 
 -- Clear all verification marks
@@ -247,11 +284,25 @@ end
 
 -- Close practice mode
 local function close_practice()
+  -- Focus practice window first
+  if state.practice_win and vim.api.nvim_win_is_valid(state.practice_win) then
+    vim.api.nvim_set_current_win(state.practice_win)
+  end
+
+  -- Close instruction window
   if state.instruction_win and vim.api.nvim_win_is_valid(state.instruction_win) then
     vim.api.nvim_win_close(state.instruction_win, true)
   end
-  if state.practice_win and vim.api.nvim_win_is_valid(state.practice_win) then
-    vim.api.nvim_win_close(state.practice_win, true)
+
+  -- Use :only to close all other windows and keep current window
+  vim.cmd('only')
+
+  -- Delete both buffers
+  if state.instruction_buf and vim.api.nvim_buf_is_valid(state.instruction_buf) then
+    vim.api.nvim_buf_delete(state.instruction_buf, { force = true })
+  end
+  if state.practice_buf and vim.api.nvim_buf_is_valid(state.practice_buf) then
+    vim.api.nvim_buf_delete(state.practice_buf, { force = true })
   end
 
   if state.on_complete_callback then
@@ -296,21 +347,18 @@ function M.start(config)
   vim.bo[state.instruction_buf].modifiable = false
   vim.bo[state.instruction_buf].buftype = 'nofile'
 
-  -- Create split layout
-  vim.cmd('split')
+  -- Create vertical split layout (side-by-side)
+  -- First set the practice buffer in current window
   state.practice_win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(state.practice_win, state.practice_buf)
 
-  vim.cmd('aboveleft split')
+  -- Create instruction window on left
+  vim.cmd('aboveleft vsplit')
   state.instruction_win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(state.instruction_win, state.instruction_buf)
 
-  -- Update instructions
+  -- Update instructions (this also resizes windows)
   update_instructions()
-
-  -- Resize instruction window
-  local instruction_height = #vim.api.nvim_buf_get_lines(state.instruction_buf, 0, -1, false) + 1
-  vim.api.nvim_win_set_height(state.instruction_win, instruction_height)
 
   -- Focus practice window
   vim.api.nvim_set_current_win(state.practice_win)
@@ -326,7 +374,7 @@ function M.start(config)
   vim.keymap.set('n', 'v', verify_task, opts)
   vim.keymap.set('n', 'n', next_step, opts)
   vim.keymap.set('n', 'p', prev_step, opts)
-  vim.keymap.set('n', 'q', close_practice, opts)
+  vim.keymap.set('n', 'quit', close_practice, opts)
   vim.keymap.set('n', '<Esc>', close_practice, opts)
 
   -- Set keymaps for instruction buffer
@@ -334,7 +382,7 @@ function M.start(config)
   vim.keymap.set('n', 'v', verify_task, inst_opts)
   vim.keymap.set('n', 'n', next_step, inst_opts)
   vim.keymap.set('n', 'p', prev_step, inst_opts)
-  vim.keymap.set('n', 'q', close_practice, inst_opts)
+  vim.keymap.set('n', 'quit', close_practice, inst_opts)
   vim.keymap.set('n', '<Esc>', close_practice, inst_opts)
 end
 

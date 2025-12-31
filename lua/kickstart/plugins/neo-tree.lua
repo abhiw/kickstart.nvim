@@ -16,6 +16,14 @@ return {
   },
   opts = {
     sources = { 'filesystem', 'buffers' },
+    source_selector = {
+      winbar = true,
+      statusline = false,
+      tab_labels = {
+        filesystem = ' Files',
+        buffers = ' Buffers',
+      },
+    },
     filesystem = {
       window = {
         mappings = {
@@ -26,15 +34,20 @@ return {
       },
     },
     buffers = {
+      bind_to_cwd = false, -- Show all buffers regardless of current directory
       follow_current_file = {
-        enabled = true,
+        enabled = true, -- Highlight the currently active buffer
       },
+      group_empty_dirs = true, -- Group empty directories together
+      show_unloaded = true, -- Show unloaded buffers from sessions
       window = {
         mappings = {
           ['\\'] = 'close_window',
           [']'] = 'next_source',
           ['['] = 'prev_source',
           ['d'] = 'buffer_delete',
+          ['.'] = 'set_root',
+          ['<bs>'] = 'navigate_up',
         },
       },
     },
