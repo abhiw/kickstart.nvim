@@ -636,7 +636,13 @@ require('lazy').setup({
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
+        float = {
+          border = 'rounded',
+          source = 'if_many',
+          wrap = true,
+          max_width = math.floor(vim.o.columns * 0.8),
+          max_height = math.floor(vim.o.lines * 0.8),
+        },
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -646,20 +652,64 @@ require('lazy').setup({
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
         } or {},
-        virtual_text = {
-          source = 'if_many',
-          spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
-        },
+        -- Disable virtual text to avoid truncation; full messages shown in float
+        virtual_text = false,
       }
+
+      -- Configure LSP handlers for hover and signature help with wrapping
+      local function make_floating_popup_options(max_width, max_height)
+        max_width = max_width or math.floor(vim.o.columns * 0.8)
+        max_height = max_height or math.floor(vim.o.lines * 0.8)
+        return function(_, result, ctx, config)
+          config = config or {}
+          config.border = config.border or 'rounded'
+          config.max_width = max_width
+          config.max_height = max_height
+          config.wrap = true
+          config.wrap_at = max_width
+          config.focusable = true
+          config.focus = false
+          return config
+        end
+      end
+
+      -- Override default handlers with wrapping enabled
+      local original_hover = vim.lsp.handlers['textDocument/hover']
+      vim.lsp.handlers['textDocument/hover'] = function(err, result, ctx, config)
+        config = make_floating_popup_options()(nil, result, ctx, config)
+        original_hover(err, result, ctx, config)
+      end
+
+      local original_signature = vim.lsp.handlers['textDocument/signatureHelp']
+      vim.lsp.handlers['textDocument/signatureHelp'] = function(err, result, ctx, config)
+        config = make_floating_popup_options()(nil, result, ctx, config)
+        original_signature(err, result, ctx, config)
+      end
+
+      -- Set window options for all LSP floating windows
+      local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+      function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+        opts = opts or {}
+        opts.border = opts.border or 'rounded'
+        opts.max_width = opts.max_width or math.floor(vim.o.columns * 0.8)
+        opts.max_height = opts.max_height or math.floor(vim.o.lines * 0.8)
+        local bufnr, winid = orig_util_open_floating_preview(contents, syntax, opts, ...)
+        vim.wo[winid].wrap = true
+        vim.wo[winid].linebreak = true
+        return bufnr, winid
+      end
+
+      -- Auto-show full diagnostic message in float when cursor is on diagnostic line
+      vim.api.nvim_create_autocmd('CursorHold', {
+        group = vim.api.nvim_create_augroup('diagnostic-float-on-hold', { clear = true }),
+        callback = function()
+          vim.diagnostic.open_float(nil, {
+            focusable = false,
+            close_events = { 'BufLeave', 'CursorMoved', 'InsertEnter', 'FocusLost' },
+            scope = 'cursor',
+          })
+        end,
+      })
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
